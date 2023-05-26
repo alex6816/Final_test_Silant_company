@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<h4>Проверьте комплектацию и технические характеристики техники Силант</h4>
+<form id="search" class="search" method="get">
+    <input id="search-input" type="search" name="q" placeholder="Введите заводской номер погрузчика">
+    <button id="search-button" type="button">Найти</button>
+</form>
+<h3>Информация о комплектации и технических характеристиках Вашей техники</h3>
+<section class="area-table"> 
+    <table id="tableCars" class="datatable" data-order='[0, "asc"]'>
+        <thead class="datatable-thead">
+            <tr>
+                <th>Зав. № погрузчика</th>
+                <th>Модель погрузчика</th>
+                <th>Модель двигателя</th>
+                <th>Зав. № двигателя</th>
+                <th>Модель трансмиссии</th>
+                <th>Зав. № трансмиссии</th>
+                <th>Модель ведущего моста</th>
+                <th>Зав. № ведущего моста</th>
+                <th>Модель управляемого моста</th>
+                <th>Зав. № управляемого моста</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for obj in object_list %}
+            <tr>
+                <td>{{obj.serial_number}}</td>
+                <td><span class="description-js" data-url="{% url 'car_description' obj.pk 'car_model' %}">{{obj.car_model}}</span></td>
+                <td><span class="description-js" data-url="{% url 'car_description' obj.pk 'engine_model' %}">{{obj.engine_model}}</span></td>
+                <td>{{obj.engine_number}}</td>
+                <td><span class="description-js" data-url="{% url 'car_description' obj.pk 'transmission_model' %}">{{obj.transmission_model}}</span></td>
+                <td>{{obj.transmission_number}}</td>
+                <td><span class="description-js" data-url="{% url 'car_description' obj.pk 'drive_axle_model' %}">{{obj.drive_axle_model}}</span></td>
+                <td>{{obj.drive_axle_number}}</td>
+                <td><span class="description-js" data-url="{% url 'car_description' obj.pk 'steerable_axle_model' %}">{{obj.steerable_axle_model}}</span></td>
+                <td>{{obj.steerable_axle_number}}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

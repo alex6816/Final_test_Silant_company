@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="client">
+    <i class="silant silant-client"></i>
+    {% if user.is_superuser %}
+        <h2>Администратор</h2>
+    {% elif user.groups.first.name == "Менеджер" %}
+        <h2>Менеджер {{user.first_name}} {{user.last_name}}</h2>
+    {% elif user.groups.first.name == "Сервисная организация" %}
+        <h2>{{user.first_name}} {{user.last_name}} / Сервисная организация {{user.useracc.service_company}}</h2>
+    {% else %}
+        <h2>Клиент {{user.first_name}} {{user.last_name}}</h2>
+    {% endif %}
+</div>
+<h3>Информация о комплектации и технических характеристиках Вашей техники</h3>
+<nav class="nav-panel">
+    <ul>
+        <li><a href="{% url 'car_list' %}"><i class="silant silant-vehicle"></i> Погрузчики</a></li>
+        <li class="active"><a href="{% url 'maintenance_list' %}"><i class="silant silant-maintenance"></i> ТО</a></li>
+        <li><a href="{% url 'claim_list' %}"><i class="silant silant-complaint"></i> Рекламации</a></li>
+    </ul>
+</nav>
+{% if user.is_superuser or user.groups.first.name == "Сервисная организация" or user.groups.first.name == "Менеджер" %}
+<div class="action-buttons">
+    <a href="{% url 'maintenance_create' %}">Создать ТО</a>
+</div>
+{% else %} 
+    <br>
+{% endif %}
+<section class="area-table"> 
+<table id="tableMaintenances" class="datatable" data-order='[0, "desc"]'>
+    <thead class="datatable-thead">
+        <tr>
+            <th width="30%">Погрузчик</th>
+            <th width="20%">Дата проведения ТО</th>
+            <th width="40%">Вид ТО</th>
+            <th width="30%">Наработка, м/час</th>
+            <th width="20%">№ заказ-наряда</th>
+            <th width="20%">Дата заказ-наряда</th>
+            <th width="30%">Организация, проводившая ТО</th>
+            {% if user.is_superuser or user.groups.first.name == "Менеджер" or user.groups.first.name == "Сервисная организация" %}
+            <th width="3%"></th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+    {% for obj in object_list %}
+        <tr>
+            <td><a href="{% url 'car_detail' obj.autocar.pk %}">{{obj.autocar}}</a></td>
+            <td>{{obj.maintenance_date|date:"d.m.Y"}}</td>
+            <td><span class="description-js" data-url="{% url 'maintenance_description' obj.pk 'maintenance_type' %}">{{obj.maintenance_type}}</span></td>
+            <td>{{obj.operating_time}}</td>
+            <td>{{obj.work_order_number}}</td>
+            <td>{{obj.work_order_date|date:"d.m.Y"}}</td>
+            {% if obj.service_company %}
+            <td><span class="description-js" data-url="{% url 'maintenance_description' obj.pk 'service_company' %}">{{obj.service_company}}</span></td>
+            {% else %}
+            <td>Нет компании</td>
+            {% endif %}
+            {% if user.is_superuser or user.groups.first.name == "Менеджер" or user.groups.first.name == "Сервисная организация" %}
+            <td>
+                <div class="actions">
+                    <a class="update" href="{% url 'maintenance_update' obj.pk %}"><i class="fas fa-pencil-alt"></i></a>
+                    <a class="delete delete-js" data-url="{% url 'maintenance_delete' obj.pk %}"><i class="fas fa-times"></i></a>
+                </div>
+            </td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</section>
+{% endblock %}
